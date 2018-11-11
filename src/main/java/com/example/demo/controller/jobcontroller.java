@@ -18,16 +18,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/restapi")
 public class jobcontroller {
-    ArrayList<second> processlist=new ArrayList();
+    ArrayList<String> job_sequence;
 
 
     @CrossOrigin
     @PostMapping("/job")
-    public String getResponse(@RequestParam("jstring") String jobs){
-        String job="";
+    public ArrayList<String> getResponse(@RequestParam("jstring") String jobs) {
+        job_sequence=new ArrayList();
+        String job = "";
         int aa, b, c, i, ii, iii, iiii;
         int no_Process, total_Burst_Time = 0;
-        int totalwaitingTime = 0, totalturnaroundtime = 0;;
+        int totalwaitingTime = 0, totalturnaroundtime = 0;
+        ;
         int count = 0;
         double large = 0, averagewaitingTime = 0, averageturnaroundtime = 0;
         double num;
@@ -36,23 +38,20 @@ public class jobcontroller {
         ArrayList<process> process = new ArrayList();
 
         try {
-            JSONArray ja=new JSONArray(jobs);
-            for(int m=0;m<ja.length();m++){
-                JSONObject jo=(JSONObject) ja.get(m);
-                String jobname=jo.get("jobname").toString();
-                int burst =Integer.parseInt(jo.get("jobburst").toString());
-                int arrival=Integer.parseInt(jo.get("jobarrival").toString());
-                int priority=Integer.parseInt(jo.get("priority").toString());
-                com.example.demo.controller.process process1=new process(jobname,arrival,burst,priority);
+            JSONArray ja = new JSONArray(jobs);
+            for (int m = 0; m < ja.length(); m++) {
+                JSONObject jo = (JSONObject) ja.get(m);
+                String jobname = jo.get("jobname").toString();
+                int burst = Integer.parseInt(jo.get("jobburst").toString());
+                int arrival = Integer.parseInt(jo.get("jobarrival").toString());
+                int priority = Integer.parseInt(jo.get("priority").toString());
+                process process1 = new process(jobname, arrival, burst, priority);
                 process.add(process1);
-                job+=jobname+"";
+                job += jobname + "";
 
 
             }
-        }
-
-
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -67,7 +66,7 @@ public class jobcontroller {
             b = 0;
             large = 0;
             for (aa = 0; aa < no_Process; aa++) {
-                if (process.get(aa).arrivalTime > count||process.get(aa).burstTime<=0) {
+                if (process.get(aa).arrivalTime > count || process.get(aa).burstTime <= 0) {
                     b++;
                 }
             }
@@ -93,11 +92,13 @@ public class jobcontroller {
                 if (large == process.get(iiiii).priorityvalue) {
                     process.get(iiiii).burstTime = process.get(iiiii).burstTime - 1;
                     count++;
-                    System.out.println(" this one  "+process.get(iiiii).processName);
+                    job_sequence.add(process.get(iiiii).processName);
+                    System.out.println(" this one  " + process.get(iiiii).processName);
                     //   System.out.println(" count=  " + count);
                     if (process.get(iiiii).burstTime <= 0) {
                         process.get(iiiii).completion = count;
-                        System.out.println(" this one  "+process.get(iiiii).processName+""+process.get(iiiii).completion);
+
+                        System.out.println(" this one  " + process.get(iiiii).processName + "" + process.get(iiiii).completion);
                     }
                     //  process.get(iiiii).turnaroundtime=count-process.get(iiiii).arrivalTime;
                 }
@@ -124,31 +125,32 @@ public class jobcontroller {
         System.out.println("Average waiting time = " + averagewaitingTime);
         System.out.println("Average turnaround  time = " + averageturnaroundtime);
 
-
-        return job;
+        process = new ArrayList();
+        return job_sequence;
     }
 
-   }
 
-class process {
+    static class process {
 
-    String processName;
-    int arrivalTime;
-    int burstTime;
-    int burstTime1;
-    int completion;
-    int waitingTime;
-    int startTime;
-    double ratio;
-    double num;
-    int turnaroundtime;
-    int priorityvalue;
-    process(String processName, int arrivalTime, int burstTime, int priorityvalue) {
-        this.processName=processName;
-        this.priorityvalue=priorityvalue;
-        this.burstTime=burstTime;
-        this.arrivalTime=arrivalTime;
+        String processName;
+        int arrivalTime;
+        int burstTime;
+        int burstTime1;
+        int completion;
+        int waitingTime;
+        int startTime;
+        double ratio;
+        double num;
+        int turnaroundtime;
+        int priorityvalue;
+
+        process(String processName, int arrivalTime, int burstTime, int priorityvalue) {
+            this.processName = processName;
+            this.priorityvalue = priorityvalue;
+            this.burstTime = burstTime;
+            this.arrivalTime = arrivalTime;
 
 
+        }
     }
 }
